@@ -1,0 +1,24 @@
+{
+  "repository": "software-reverse-engineering-studio",
+  "title": "Software Reverse Engineering Studio",
+  "master_skill": "software-reverse-engineering-studio",
+  "discoverable_skills": 1,
+  "internal_modules": [
+    "software-reverse-engineer.md",
+    "web-app-analyzer.md",
+    "apk-analysis-engineer.md",
+    "binary-analysis-engineer.md",
+    "api-traffic-analyzer.md",
+    "human-centered-product-design.md",
+    "design-quality-critic.md",
+    "product-experience-engineer.md",
+    "INDEX.md"
+  ],
+  "module_count": 8,
+  "human_centered_modules": [
+    "human-centered-product-design",
+    "design-quality-critic",
+    "product-experience-engineer"
+  ],
+  "note": "Internal modules are reference playbooks, not separate discoverable skills."
+}
