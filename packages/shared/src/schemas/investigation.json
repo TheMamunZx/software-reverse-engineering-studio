@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sre-studio.dev/schemas/investigation.json",
+  "version": "1.0.0",
+  "title": "Investigation Session",
+  "type": "object",
+  "required": ["id", "projectId", "name", "targets", "authorization", "status", "progress", "config", "createdAt", "updatedAt", "createdBy", "tags"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^ses_[a-f0-9]{16}$" },
+    "projectId": { "type": "string" },
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["targetId", "role", "addedAt"],
+        "properties": {
+          "targetId": { "type": "string", "pattern": "^tgt_[a-f0-9]{16}$" },
+          "role": { "type": "string", "enum": ["primary", "secondary", "reference"] },
+          "addedAt": { "type": "string", "format": "date-time" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "authorization": {
+      "type": "object",
+      "required": ["type", "description", "scope", "limitations", "verified"],
+      "properties": {
+        "type": { "type": "string", "enum": ["owner", "explicit-permission", "public", "authorized-testing"] },
+        "description": { "type": "string" },
+        "grantedBy": { "type": "string" },
+        "grantedAt": { "type": "string", "format": "date-time" },
+        "scope": { "type": "array", "items": { "type": "string" } },
+        "limitations": { "type": "array", "items": { "type": "string" } },
+        "documentReference": { "type": "string" },
+        "verified": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "status": { "type": "string", "enum": ["initialized", "running", "paused", "completed", "failed", "archived"] },
+    "progress": {
+      "type": "object",
+      "required": ["totalSteps", "completedSteps", "findingsCount", "evidenceCount", "errors"],
+      "properties": {
+        "totalSteps": { "type": "integer", "minimum": 0 },
+        "completedSteps": { "type": "integer", "minimum": 0 },
+        "currentStep": { "type": "string" },
+        "findingsCount": { "type": "integer", "minimum": 0 },
+        "evidenceCount": { "type": "integer", "minimum": 0 },
+        "errors": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "providers": { "type": "array", "items": { "type": "string" } },
+        "resourceLimits": {
+          "type": "object",
+          "properties": {
+            "maxMemoryMb": { "type": "integer" },
+            "maxCpuPercent": { "type": "integer" },
+            "maxDurationMs": { "type": "integer" },
+            "maxConcurrentAnalyses": { "type": "integer" },
+            "maxDiskUsageMb": { "type": "integer" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "createdBy": { "type": "string" },
+    "tags": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

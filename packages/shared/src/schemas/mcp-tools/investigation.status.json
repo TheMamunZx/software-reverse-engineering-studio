@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sre-studio.dev/schemas/mcp-tools/investigation.status.json",
+  "version": "1.0.0",
+  "title": "Investigation Status Tool Input",
+  "type": "object",
+  "required": ["sessionId"],
+  "properties": {
+    "sessionId": { "type": "string", "pattern": "^ses_[a-f0-9]{16}$" }
+  },
+  "additionalProperties": false
+}

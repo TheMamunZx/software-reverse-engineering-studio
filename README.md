@@ -3,22 +3,129 @@
 <div align="center">
 
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/TheMamunZx/software-reverse-engineering-studio)
+[![Release](https://img.shields.io/badge/Release-v0.1.0--beta.1-blue.svg)](https://github.com/TheMamunZx/software-reverse-engineering-studio/releases)
+[![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude-Code-5A67D8)](https://claude.ai/code)
 [![OpenCode](https://img.shields.io/badge/Open-Code-00A67E)](https://opencode.dev)
 
 **Analyze authorized software behavior · Document observable patterns · Build independent implementations**
 
-[Overview](#about-software-reverse-engineering-studio) · [Quick Start](#quick-start) · [Architecture](#master-skill-architecture) · [Workflow](#reverse-engineering-workflow) · [Installation](#claude-code-installation) · [Security](#security-and-authorization-requirements)
+[Overview](#about-software-reverse-engineering-studio) · [Status & Capabilities](#release-status--capability-matrix) · [Quick Start](#quick-start-cli--mcp) · [Workflow](docs/guides/investigation-workflow.md) · [Architecture](docs/architecture/overview.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
 
 </div>
 
 ---
 
+## Release Status & Capability Matrix
+
+> [!NOTE]
+> **Release Classification: Beta (`v0.1.0-beta.1`)**
+> SRE Studio is currently in public Beta. The core orchestration, normalized SQLite persistence, fail-closed authorization, interactive CLI, MCP stdio server, and multi-format reporting are fully implemented and verified with 306+ automated tests. Third-party disassembly/decompilation backends (`rizin`, `jadx`, `apktool`) require external user-installed binaries; `aapt2` is verified live on Windows.
+
+| Capability Area | Status | Description |
+|-----------------|--------|-------------|
+| **Core Orchestrator & Sessions** | **Implemented** | Session lifecycle, targets, environments, evidence graph, SQLite WAL persistence with foreign keys |
+| **Fail-Closed Security** | **Implemented** | Strict boundary policies, empty-boundary rejection, path traversal defense, symlink/junction resolution (`fs.realpathSync`), target SHA-256 allowlists |
+| **Model Context Protocol (MCP)** | **Implemented** | stdio JSON-RPC server with 8 versioned tools, Draft 2020-12 JSON Schema validation |
+| **CLI (`sre-studio`)** | **Implemented** | Interactive commands: `init`, `status`, `target`, `capabilities`, `analyze`, `evidence`, `report`, `doctor`, `provider`, `close` |
+| **Multi-Format Reporting** | **Implemented** | Markdown, HTML, JSON, and OASIS SARIF v2.1.0 reports verified against 1,000 findings |
+| **Subprocess Execution Safety** | **Implemented** | Argument arrays with `shell: false`, timeouts, buffer caps, concurrency limits, memory checks |
+| **Packaging & Distribution** | **Implemented** | Clean pnpm workspaces, 0 leaked files, tarball audit script (`pnpm run pack:audit`) |
+| **Android Asset Analysis (`aapt2`)** | **Implemented & Verified Live** | Static manifest, resources, package details via live Windows `aapt2.exe` |
+| **Native Binary Fallback** | **Implemented** | In-tree pure JS/TS parsers for ELF, PE, and DEX headers/sections/strings |
+| **Binary Disassembly (`rizin` / `rabin2`)** | **External-Tool Dependent** | Code complete with safe subprocess execution; requires external Rizin installation |
+| **Android Decompilation (`jadx` / `apktool`)**| **External-Tool Dependent** | Code complete with safe subprocess execution; requires external JADX / Apktool installation |
+| **OS-Level Kernel Sandboxing** | **Planned (Future)** | Windows Job Object isolation, Linux cgroups/namespaces (current controls are advisory) |
+| **Web UI / Electron Desktop** | **Planned (Future)** | Standalone desktop/browser interactive reverse engineering interface |
+| **Ghidra / IDA Pro Integration** | **Planned (Future)** | Headless decompilation backends for Ghidra and IDA Pro |
+
+---
+
 ## About Software Reverse Engineering Studio
 
-Coordinate end-to-end software reverse engineering workflows through one discoverable master skill. Analyze software you own or are authorized to inspect, document observable behavior, and create lawful independent implementations without copying protected source code or bypassing access controls.
+Coordinate end-to-end software reverse engineering workflows through one discoverable master skill and an agent-native reverse engineering platform. Analyze software you own or are authorized to inspect, document observable behavior, and create lawful independent implementations without copying protected source code or bypassing access controls.
 
-This repository provides agent-driven reverse engineering capabilities for websites, web applications, Android APKs, binaries, and API traffic. Internal specialist modules are loaded automatically based on analysis targets—you select only the master skill.
+This repository provides both an agent skill pack and a complete TypeScript monorepo platform featuring a Model Context Protocol (MCP) server, interactive CLI, Core investigation engine with fail-closed authorization, SQLite persistence, and pluggable static analysis providers.
+
+## Architecture & Monorepo Packages
+
+SRE Studio is structured as a clean-room monorepo managed with pnpm workspaces:
+
+```
+software-reverse-engineering-studio/
+├── packages/
+│   ├── shared/             # Domain types, errors, logger, and JSON schemas (Draft 2020-12)
+│   ├── core/               # Investigation engine, sessions, evidence, SQLite, and fail-closed auth
+│   ├── mcp-server/         # MCP stdio server with 8 versioned tools
+│   ├── cli/                # Interactive command line interface (sre-studio)
+│   └── providers/
+│       ├── binary/         # Static binary provider (Rizin, rabin2)
+│       └── android/        # Static Android provider (aapt2, apksigner, JADX, apktool)
+├── docs/                   # Complete architectural, setup, security, and reference guides
+│   ├── architecture/       # System architecture and data flow diagrams
+│   └── guides/             # Quick start, MCP configuration, CLI reference, and security
+├── tests/fixtures/         # Authorized, benign test fixtures (sample.exe, sample.elf, sample.apk)
+└── scripts/                # Setup, fixture generation, benchmarking, and provider diagnostics
+```
+
+### Complete Documentation
+
+- [Architecture Overview](docs/architecture/overview.md)
+- [Installation & Windows Setup Guide](docs/guides/installation.md)
+- [Quick Start Guide](docs/guides/quick-start.md)
+- [Investigation & Evidence Workflow Guide](docs/guides/investigation-workflow.md)
+- [MCP Client Integration (Claude Code, Cursor, Codex CLI)](docs/guides/mcp-configuration.md)
+- [CLI Reference](docs/guides/cli-reference.md)
+- [Provider Setup & Tool Verification](docs/guides/provider-setup.md)
+- [Security Model & Resource Limits](docs/guides/security.md)
+- [Troubleshooting & FAQ](docs/guides/troubleshooting.md)
+- [Contributing Guide](CONTRIBUTING.md)
+- [Changelog & Release Notes](CHANGELOG.md)
+
+## Quick Start (CLI & MCP)
+
+### 1. Build and Test Monorepo
+```bash
+# Windows automated setup
+.\scripts\dev-setup.ps1
+
+# Or manual build & test
+pnpm install
+pnpm run build
+pnpm run test
+```
+
+### 2. Run Interactive CLI
+```bash
+# Initialize investigation project
+sre-studio init my-investigation --name "PE Sample Analysis" --scope "Authorized testing" --auth-type owner
+cd my-investigation
+
+# Register target
+sre-studio target add ../tests/fixtures/sample-binaries/sample.exe --type binary
+
+# Check status and run analysis
+sre-studio status
+sre-studio analyze binary.info
+
+# Query findings and export report
+sre-studio evidence summary
+sre-studio report --format markdown --output report.md
+```
+
+### 3. Connect MCP to AI Assistants
+
+Start the MCP server over standard I/O:
+```bash
+node packages/mcp-server/dist/server.js
+```
+
+Configure your assistant:
+- **Claude Code**: Add `sre-studio` via `claude mcp add sre-studio -- node path/to/server.js` (or `.claude/mcp.json`).
+- **Cursor**: Configure `mcpServers.sre-studio` in `.cursor/mcp.json`.
+- **Codex CLI**: Append `[mcp_servers.sre-studio]` to `~/.codex/config.toml` (see [Codex TOML Guide](docs/guides/mcp-configuration.md#3-codex-cli-native-configuration)).
+
+---
 
 ## Project Overview and Statistics
 
@@ -366,6 +473,78 @@ cp -r software-reverse-engineering-studio/.claude/skills/software-reverse-engine
 ### Global Installation (Optional)
 
 Some agent configurations support global skill directories. Consult your agent's documentation for global skill installation procedures.
+
+## Agent Integration (MCP Server)
+
+SRE Studio provides a Model Context Protocol (MCP) server (`sre-studio-mcp`) that exposes reverse engineering tools directly to AI coding agents over stdio.
+
+Configuration files and templates are maintained in [`agent-configs/`](./agent-configs).
+
+### OpenAI Codex CLI
+
+Codex CLI uses TOML configuration (`~/.codex/config.toml` or project-scoped `.codex/config.toml`), declaring servers under `[mcp_servers.<name>]`.
+
+> [!WARNING]
+> **Preserve Existing Configuration**: Never overwrite your entire `config.toml` file. Doing so would erase your existing model configurations, aliases, and other registered MCP servers. Always append the new table or use the `codex mcp add` CLI command.
+
+#### Option 1: Automatic Registration via CLI (Recommended)
+```bash
+codex mcp add sre-studio \
+  --env SRE_STUDIO_WORKSPACE=. \
+  --env SRE_STUDIO_CONFIG=./.sre-studio/config.yaml \
+  -- sre-studio-mcp
+```
+
+#### Option 2: Safe Manual TOML Append
+Append the following table to your `~/.codex/config.toml` (global) or `.codex/config.toml` (project scope):
+```toml
+[mcp_servers.sre-studio]
+command = "sre-studio-mcp"
+args = []
+cwd = "."
+
+[mcp_servers.sre-studio.env]
+SRE_STUDIO_WORKSPACE = "."
+SRE_STUDIO_CONFIG = "./.sre-studio/config.yaml"
+```
+
+Verify with `codex mcp list` or `/mcp` inside an active Codex session.
+
+### Claude Code
+
+Add the server definition to `.mcp.json` or `~/.claude.json`:
+```json
+{
+  "mcpServers": {
+    "sre-studio": {
+      "command": "sre-studio-mcp",
+      "args": [],
+      "env": {
+        "SRE_STUDIO_WORKSPACE": "${workspaceFolder}",
+        "SRE_STUDIO_CONFIG": "${workspaceFolder}/.sre-studio/config.yaml"
+      }
+    }
+  }
+}
+```
+
+### Cursor IDE
+
+Add the server definition to `.cursor/mcp.json` or `~/.cursor/mcp.json`:
+```json
+{
+  "mcpServers": {
+    "sre-studio": {
+      "command": "sre-studio-mcp",
+      "args": [],
+      "env": {}
+    }
+  }
+}
+```
+
+> [!NOTE]
+> **Validation vs. Live Client Testing**: Configuration files and formats are validated for syntax correctness, required fields, and cross-agent consistency. Live client compatibility testing requires the respective agent client installed in the local environment.
 
 ## Supported Tools and Technologies
 

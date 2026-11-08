@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sre-studio.dev/schemas/provider.json",
+  "version": "1.0.0",
+  "title": "Provider Capability",
+  "type": "object",
+  "required": ["id", "name", "description", "category", "inputSchema", "outputSchema"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "category": { "type": "string", "enum": ["static-analysis", "extraction", "parsing"] },
+    "inputSchema": { "type": "object" },
+    "outputSchema": { "type": "object" },
+    "estimatedDurationMs": { "type": "integer", "minimum": 0 }
+  },
+  "additionalProperties": false
+}

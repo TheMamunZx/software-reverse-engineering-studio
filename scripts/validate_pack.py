@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate the single-master-skill package structure."""
 from pathlib import Path
-import re, sys
+import os, re, sys
 ROOT = Path(__file__).resolve().parents[1]
 MASTER = "software-reverse-engineering-studio"
 EXPECTED = [
@@ -30,12 +30,17 @@ direct=[p.name for p in skills_root.iterdir() if p.is_dir()] if skills_root.exis
 if direct != [MASTER]: errors.append(f"Expected exactly one discoverable skill {MASTER}, found {direct}")
 # Basic secret heuristic; allow known placeholders only.
 secret_patterns=[r"(?i)sk-[A-Za-z0-9]{20,}", r"(?i)gh[pousr]_[A-Za-z0-9]{20,}", r"(?i)AKIA[0-9A-Z]{16}"]
-for p in ROOT.rglob("*"):
-    if p.is_file() and ".git" not in p.parts and p.suffix.lower() in {".md",".json",".yaml",".yml",".py",".sh",".ps1",".toml"}:
-        try: data=p.read_text(encoding="utf-8")
-        except Exception: continue
-        for pat in secret_patterns:
-            if re.search(pat,data): errors.append(f"Possible credential pattern in {p.relative_to(ROOT)}")
+skip_dirs = {".git", "node_modules", "dist", ".pnpm"}
+for root, dirs, files in os.walk(ROOT):
+    dirs[:] = [d for d in dirs if d not in skip_dirs]
+    for file in files:
+        ext = os.path.splitext(file)[1].lower()
+        if ext in {".md",".json",".yaml",".yml",".py",".sh",".ps1",".toml"}:
+            p = Path(root) / file
+            try: data = p.read_text(encoding="utf-8")
+            except Exception: continue
+            for pat in secret_patterns:
+                if re.search(pat, data): errors.append(f"Possible credential pattern in {p.relative_to(ROOT)}")
 if errors:
     print("VALIDATION FAILED")
     for e in errors: print("-",e)

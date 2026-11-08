@@ -1,0 +1,49 @@
+{
+  "name": "@sre-studio/shared",
+  "version": "0.1.0",
+  "description": "Shared types, schemas, and utilities for SRE Studio",
+  "license": "Apache-2.0",
+  "author": "SRE Studio Contributors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TheMamunZx/software-reverse-engineering-studio.git",
+    "directory": "packages/shared"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./schemas/*": "./dist/schemas/*"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --out-dir dist && node ./scripts/copy-schemas.mjs",
+    "build:schemas": "node ./scripts/copy-schemas.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src --ext .ts",
+    "clean": "node ../../scripts/clean.mjs dist"
+  },
+  "dependencies": {
+    "ajv": "^8.17.0",
+    "ajv-formats": "^3.0.1",
+    "pino": "^9.0.0"
+  },
+  "devDependencies": {
+    "@sre-studio/tsconfig": "workspace:*",
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0",
+    "eslint": "^9.0.0",
+    "tsup": "^8.0.0"
+  }
+}

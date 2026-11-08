@@ -1,0 +1,69 @@
+name: Draft Release Packaging
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-release-artifacts:
+    name: Build & Package Release Artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Setup Node.js 20.x LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build all packages
+        run: pnpm run build
+
+      - name: Run verification tests
+        run: pnpm run test
+
+      - name: Package publishable tarballs (4 public packages)
+        run: |
+          mkdir -p release-artifacts
+          for pkg in packages/shared packages/core packages/mcp-server packages/cli; do
+            pnpm --filter "$(node -p "require('./$pkg/package.json').name")" pack --pack-destination release-artifacts
+          done
+
+      - name: Compute SHA-256 Checksums
+        working-directory: release-artifacts
+        run: |
+          sha256sum *.tgz > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Create Draft GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          draft: true
+          prerelease: true
+          files: |
+            release-artifacts/*.tgz
+            release-artifacts/SHA256SUMS.txt
+          body: |
+            ## Software Reverse Engineering Studio - Beta Release
+            
+            Please see [CHANGELOG.md](https://github.com/TheMamunZx/software-reverse-engineering-studio/blob/main/CHANGELOG.md) for full release details.
+            
+            ### Artifact Integrity Checksums
+            Included in `SHA256SUMS.txt`.
+            
+            > **Note:** NPM publishing is guarded and requires manual authorization.
+

@@ -1,0 +1,10 @@
+{
+  "name": "@sre-studio/tsconfig",
+  "version": "0.1.0",
+  "description": "Shared TypeScript configuration for SRE Studio",
+  "type": "module",
+  "main": "index.json",
+  "files": [
+    "index.json"
+  ]
+}

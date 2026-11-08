@@ -1,0 +1,17 @@
+# Codex CLI MCP Server Configuration Example
+#
+# IMPORTANT: Append this table to your ~/.codex/config.toml (or .codex/config.toml for project scope).
+# DO NOT overwrite your entire config.toml file, or you will lose other Codex configurations.
+#
+# Alternatively, register via the Codex CLI:
+#   codex mcp add sre-studio --env SRE_STUDIO_WORKSPACE=. --env SRE_STUDIO_CONFIG=./.sre-studio/config.yaml -- sre-studio-mcp
+
+[mcp_servers.sre-studio]
+command = "sre-studio-mcp"
+args = []
+cwd = "."
+
+[mcp_servers.sre-studio.env]
+SRE_STUDIO_WORKSPACE = "."
+SRE_STUDIO_CONFIG = "./.sre-studio/config.yaml"
+

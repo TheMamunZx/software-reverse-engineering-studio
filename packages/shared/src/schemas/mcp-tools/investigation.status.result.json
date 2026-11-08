@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sre-studio.dev/schemas/mcp-tools/investigation.status.result.json",
+  "version": "1.0.0",
+  "title": "Investigation Status Tool Output",
+  "type": "object",
+  "required": ["sessionId", "status", "progress", "findingsCount"],
+  "properties": {
+    "sessionId": { "type": "string", "pattern": "^ses_[a-f0-9]{16}$" },
+    "status": { "type": "string", "enum": ["initialized", "running", "paused", "completed", "failed", "archived"] },
+    "progress": {
+      "type": "object",
+      "required": ["totalSteps", "completedSteps"],
+      "properties": {
+        "totalSteps": { "type": "integer", "minimum": 0 },
+        "completedSteps": { "type": "integer", "minimum": 0 },
+        "currentStep": { "type": "string" },
+        "findingsCount": { "type": "integer", "minimum": 0 },
+        "evidenceCount": { "type": "integer", "minimum": 0 },
+        "errors": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "findingsCount": { "type": "integer", "minimum": 0 }
+  },
+  "additionalProperties": false
+}

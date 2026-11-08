@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sre-studio.dev/schemas/mcp-tools/analysis.capabilities.result.json",
+  "version": "1.0.0",
+  "title": "Analysis Capabilities Tool Output",
+  "type": "object",
+  "required": ["capabilities"],
+  "properties": {
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "description", "category", "providerId"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "category": { "type": "string", "enum": ["static-analysis", "extraction", "parsing"] },
+          "providerId": { "type": "string", "pattern": "^prv_[a-f0-9]{16}$" },
+          "inputSchema": { "type": "object" },
+          "outputSchema": { "type": "object" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

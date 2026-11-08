@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sre-studio.dev/schemas/mcp-tools/investigation.start.result.json",
+  "version": "1.0.0",
+  "title": "Investigation Start Tool Output",
+  "type": "object",
+  "required": ["sessionId", "targetId", "status", "capabilities"],
+  "properties": {
+    "sessionId": { "type": "string", "pattern": "^ses_[a-f0-9]{16}$" },
+    "targetId": { "type": "string", "pattern": "^tgt_[a-f0-9]{16}$" },
+    "status": { "type": "string", "enum": ["initialized"] },
+    "capabilities": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

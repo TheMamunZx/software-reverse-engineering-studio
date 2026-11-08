@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sre-studio.dev/schemas/mcp-tools/target.register.json",
+  "version": "1.0.0",
+  "title": "Target Register Tool Input",
+  "type": "object",
+  "required": ["sessionId", "target"],
+  "properties": {
+    "sessionId": { "type": "string", "pattern": "^ses_[a-f0-9]{16}$" },
+    "target": {
+      "type": "object",
+      "required": ["type", "path"],
+      "properties": {
+        "type": { "type": "string", "enum": ["binary", "android"] },
+        "path": { "type": "string", "minLength": 1 },
+        "hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      },
+      "additionalProperties": false
+    },
+    "authorization": {
+      "type": "object",
+      "required": ["type", "description"],
+      "properties": {
+        "type": { "type": "string", "enum": ["owner", "explicit-permission", "public", "authorized-testing"] },
+        "description": { "type": "string", "minLength": 1 },
+        "documentRef": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sre-studio.dev/schemas/mcp-tools/investigation.start.json",
+  "version": "1.0.0",
+  "title": "Investigation Start Tool Input",
+  "type": "object",
+  "required": ["target", "scope", "authorization"],
+  "properties": {
+    "target": {
+      "type": "object",
+      "required": ["type", "path"],
+      "properties": {
+        "type": { "type": "string", "enum": ["binary", "android"] },
+        "path": { "type": "string", "minLength": 1 },
+        "hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      },
+      "additionalProperties": false
+    },
+    "scope": { "type": "string", "minLength": 1 },
+    "authorization": {
+      "type": "object",
+      "required": ["type", "description"],
+      "properties": {
+        "type": { "type": "string", "enum": ["owner", "explicit-permission", "public", "authorized-testing"] },
+        "description": { "type": "string", "minLength": 1 },
+        "documentRef": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "providers": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

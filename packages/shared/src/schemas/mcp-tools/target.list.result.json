@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sre-studio.dev/schemas/mcp-tools/target.list.result.json",
+  "version": "1.0.0",
+  "title": "Target List Tool Output",
+  "type": "object",
+  "required": ["targets"],
+  "properties": {
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["targetId", "type", "path", "role", "addedAt"],
+        "properties": {
+          "targetId": { "type": "string", "pattern": "^tgt_[a-f0-9]{16}$" },
+          "type": { "type": "string", "enum": ["binary", "android"] },
+          "path": { "type": "string" },
+          "role": { "type": "string", "enum": ["primary", "secondary", "reference"] },
+          "addedAt": { "type": "string", "format": "date-time" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

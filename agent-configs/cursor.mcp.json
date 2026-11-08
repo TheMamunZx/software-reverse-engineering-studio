@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "sre-studio": {
+      "command": "sre-studio-mcp",
+      "args": [],
+      "env": {}
+    }
+  }
+}

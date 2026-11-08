@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sre-studio.dev/schemas/mcp-tools/evidence.query.result.json",
+  "version": "1.0.0",
+  "title": "Evidence Query Tool Output",
+  "type": "object",
+  "required": ["findings", "total", "hasMore"],
+  "properties": {
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "observation", "category", "severity", "confidence", "evidence", "provenance", "createdAt"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^fnd_[a-f0-9]{16}$" },
+          "title": { "type": "string" },
+          "observation": { "type": "string" },
+          "inference": { "type": "string" },
+          "category": { "type": "string", "enum": ["structure", "behavior", "code", "data", "network", "security", "configuration", "dependency", "anomaly", "other"] },
+          "severity": { "type": "string", "enum": ["critical", "high", "medium", "low", "info"] },
+          "confidence": {
+            "type": "object",
+            "required": ["level", "value", "justification"],
+            "properties": {
+              "level": { "type": "string", "enum": ["high", "medium", "low", "none"] },
+              "value": { "type": "number", "minimum": 0, "maximum": 1 },
+              "justification": { "type": "string" }
+            },
+            "additionalProperties": false
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["type", "location"],
+              "properties": {
+                "type": { "type": "string", "enum": ["file", "memory", "network", "tool-output", "observation"] },
+                "location": { "type": "object" },
+                "excerpt": { "type": "string" },
+                "hash": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "provenance": {
+            "type": "object",
+            "required": ["derivedFrom", "tool", "command"],
+            "properties": {
+              "derivedFrom": { "type": "array", "items": { "type": "string", "pattern": "^fnd_[a-f0-9]{16}$" } },
+              "tool": { "type": "string" },
+              "command": { "type": "string" }
+            },
+            "additionalProperties": false
+          },
+          "createdAt": { "type": "string", "format": "date-time" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "total": { "type": "integer", "minimum": 0 },
+    "hasMore": { "type": "boolean" }
+  },
+  "additionalProperties": false
+}

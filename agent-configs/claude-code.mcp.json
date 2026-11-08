@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "sre-studio": {
+      "command": "sre-studio-mcp",
+      "args": [],
+      "env": {
+        "SRE_STUDIO_WORKSPACE": "${workspaceFolder}",
+        "SRE_STUDIO_CONFIG": "${workspaceFolder}/.sre-studio/config.yaml"
+      }
+    }
+  }
+}

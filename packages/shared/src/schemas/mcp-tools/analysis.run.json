@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sre-studio.dev/schemas/mcp-tools/analysis.run.json",
+  "version": "1.0.0",
+  "title": "Analysis Run Tool Input",
+  "type": "object",
+  "required": ["sessionId", "capabilityId"],
+  "properties": {
+    "sessionId": { "type": "string", "pattern": "^ses_[a-f0-9]{16}$" },
+    "capabilityId": { "type": "string", "pattern": "^(binary|android)\\.[a-z]+" },
+    "parameters": { "type": "object", "additionalProperties": true }
+  },
+  "additionalProperties": false
+}

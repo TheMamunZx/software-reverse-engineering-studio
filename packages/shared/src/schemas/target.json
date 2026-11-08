@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sre-studio.dev/schemas/target.json",
+  "version": "1.0.0",
+  "title": "Analysis Target",
+  "type": "object",
+  "required": ["id", "sessionId", "type", "path", "metadata", "hashes", "authorization", "addedAt", "role"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^tgt_[a-f0-9]{16}$" },
+    "sessionId": { "type": "string", "pattern": "^ses_[a-f0-9]{16}$" },
+    "type": { "type": "string", "enum": ["binary", "android"] },
+    "path": { "type": "string" },
+    "metadata": { "type": "object" },
+    "hashes": {
+      "type": "object",
+      "required": ["sha256"],
+      "properties": {
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "md5": { "type": "string" },
+        "sha1": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "authorization": {
+      "type": "object",
+      "required": ["type", "description", "scope", "limitations", "verified"],
+      "properties": {
+        "type": { "type": "string", "enum": ["owner", "explicit-permission", "public", "authorized-testing"] },
+        "description": { "type": "string" },
+        "grantedBy": { "type": "string" },
+        "grantedAt": { "type": "string", "format": "date-time" },
+        "scope": { "type": "array", "items": { "type": "string" } },
+        "limitations": { "type": "array", "items": { "type": "string" } },
+        "documentReference": { "type": "string" },
+        "verified": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "addedAt": { "type": "string", "format": "date-time" },
+    "role": { "type": "string", "enum": ["primary", "secondary", "reference"] }
+  },
+  "additionalProperties": false
+}

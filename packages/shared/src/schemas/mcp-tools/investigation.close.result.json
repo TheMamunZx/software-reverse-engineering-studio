@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sre-studio.dev/schemas/mcp-tools/investigation.close.result.json",
+  "version": "1.0.0",
+  "title": "Investigation Close Tool Output",
+  "type": "object",
+  "required": ["sessionId", "finalReport"],
+  "properties": {
+    "sessionId": { "type": "string", "pattern": "^ses_[a-f0-9]{16}$" },
+    "finalReport": {
+      "type": "object",
+      "required": ["summary", "statistics", "findings"],
+      "properties": {
+        "summary": { "type": "string" },
+        "statistics": {
+          "type": "object",
+          "required": ["byCategory", "bySeverity", "avgConfidence"],
+          "properties": {
+            "byCategory": { "type": "object", "additionalProperties": { "type": "integer" } },
+            "bySeverity": { "type": "object", "additionalProperties": { "type": "integer" } },
+            "avgConfidence": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "additionalProperties": false
+        },
+        "findings": { "type": "array", "items": { "type": "string", "pattern": "^fnd_[a-f0-9]{16}$" } }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

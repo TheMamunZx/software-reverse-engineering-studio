@@ -1,0 +1,7 @@
+packages:
+  - packages/core
+  - packages/mcp-server
+  - packages/cli
+  - packages/shared
+  - packages/tsconfig
+  - packages/providers/*

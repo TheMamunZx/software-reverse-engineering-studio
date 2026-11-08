@@ -1,0 +1,47 @@
+{
+  "name": "@sre-studio/provider-binary",
+  "version": "0.1.0",
+  "description": "Binary analysis provider (Rizin-based)",
+  "license": "Apache-2.0",
+  "author": "SRE Studio Contributors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TheMamunZx/software-reverse-engineering-studio.git",
+    "directory": "packages/providers/binary"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --out-dir dist",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src --ext .ts",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@sre-studio/core": "workspace:*",
+    "@sre-studio/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@sre-studio/tsconfig": "workspace:*",
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0",
+    "eslint": "^9.0.0",
+    "tsup": "^8.0.0"
+  }
+}

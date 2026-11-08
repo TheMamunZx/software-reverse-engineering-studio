@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sre-studio.dev/schemas/evidence.json",
+  "version": "1.0.0",
+  "title": "Finding Evidence",
+  "type": "object",
+  "required": ["id", "sessionId", "targetId", "providerId", "capabilityId", "category", "severity", "title", "observation", "evidence", "confidence", "limitations", "unknowns", "provenance", "reproducibility", "createdAt", "updatedAt", "createdBy", "version"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^fnd_[a-f0-9]{16}$" },
+    "sessionId": { "type": "string", "pattern": "^ses_[a-f0-9]{16}$" },
+    "targetId": { "type": "string", "pattern": "^tgt_[a-f0-9]{16}$" },
+    "providerId": { "type": "string", "pattern": "^prv_[a-f0-9]{16}$" },
+    "capabilityId": { "type": "string" },
+    "category": { "type": "string", "enum": ["structure", "behavior", "code", "data", "network", "security", "configuration", "dependency", "anomaly", "other"] },
+    "severity": { "type": "string", "enum": ["critical", "high", "medium", "low", "info"] },
+    "title": { "type": "string" },
+    "observation": { "type": "string" },
+    "inference": { "type": "string" },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "location"],
+        "properties": {
+          "type": { "type": "string", "enum": ["file", "memory", "network", "tool-output", "observation"] },
+          "location": { "type": "object" },
+          "excerpt": { "type": "string" },
+          "hash": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "confidence": {
+      "type": "object",
+      "required": ["level", "value", "justification"],
+      "properties": {
+        "level": { "type": "string", "enum": ["high", "medium", "low", "none"] },
+        "value": { "type": "number", "minimum": 0, "maximum": 1 },
+        "justification": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "limitations": { "type": "array", "items": { "type": "string" } },
+    "unknowns": { "type": "array", "items": { "type": "string" } },
+    "provenance": {
+      "type": "object",
+      "required": ["derivedFrom", "tool", "command"],
+      "properties": {
+        "derivedFrom": { "type": "array", "items": { "type": "string", "pattern": "^fnd_[a-f0-9]{16}$" } },
+        "tool": { "type": "string" },
+        "command": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "reproducibility": {
+      "type": "object",
+      "required": ["reproducible", "environmentId"],
+      "properties": {
+        "reproducible": { "type": "boolean" },
+        "environmentId": { "type": "string", "pattern": "^env_[a-f0-9]{16}$" }
+      },
+      "additionalProperties": false
+    },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "createdBy": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 }
+  },
+  "additionalProperties": false
+}
