@@ -13,12 +13,47 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-2022]
         node-version: [20.x, 22.x]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Windows MSVC & Toolset Preflight
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          if (-not (Test-Path $vswhere)) {
+            Write-Error "vswhere.exe not found at $vswhere"
+            exit 1
+          }
+          $vsPath = & $vswhere -version "[17.0,18.0)" -property installationPath
+          if ($vsPath -is [array]) { $vsPath = $vsPath[0] }
+          if (-not $vsPath -or -not (Test-Path $vsPath)) {
+            Write-Error "Visual Studio 2022 (version 17.x) was not found by vswhere"
+            exit 1
+          }
+          Write-Host "Discovered Visual Studio 2022 at: $vsPath"
+          $msvc = & $vswhere -version "[17.0,18.0)" -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $msvc) {
+            Write-Error "MSVC C++ toolset is not installed in Visual Studio 2022"
+            exit 1
+          }
+          Write-Host "MSVC C++ toolset verified: Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
+          $sdkDir = Test-Path "${env:ProgramFiles(x86)}\Windows Kits\10"
+          $sdkFiles = Get-ChildItem -Path "${env:ProgramFiles(x86)}\Windows Kits\10\Include" -Filter "windows.h" -Recurse -ErrorAction SilentlyContinue
+          if (-not $sdkDir -and -not $sdkFiles) {
+            Write-Error "Compatible Windows SDK was not detected"
+            exit 1
+          }
+          Write-Host "Compatible Windows SDK verified."
+          Write-Host "Configuring GYP_MSVS_VERSION=2022 for node-gyp and npm..."
+          if ($env:GITHUB_ENV) {
+            "GYP_MSVS_VERSION=2022" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+            "npm_config_msvs_version=2022" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          }
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
