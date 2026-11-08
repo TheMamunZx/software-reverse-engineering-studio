@@ -10,7 +10,7 @@
  *  6. MCP server smoke test: invokes installed `sre-studio-mcp`.
  */
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, rmSync, existsSync, readdirSync, readFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, existsSync, readdirSync, readFileSync, chmodSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -128,8 +128,27 @@ try {
   console.log('  ✓ Installed 4 public tarballs successfully with ZERO internal provider packages');
 
   // Copy local workspace prebuilt better_sqlite3.node if better-sqlite3 was installed
-  const localPrebuilt = path.join(ROOT_DIR, 'node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node');
-  if (existsSync(localPrebuilt)) {
+  let localPrebuilt = path.join(ROOT_DIR, 'node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node');
+  if (!existsSync(localPrebuilt)) {
+    const findPrebuilt = (dir) => {
+      if (!existsSync(dir) || (localPrebuilt && existsSync(localPrebuilt))) return;
+      try {
+        const entries = readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+          const full = path.join(dir, entry.name);
+          if (entry.isDirectory() && !entry.name.startsWith('.bin')) {
+            findPrebuilt(full);
+          } else if (entry.name === 'better_sqlite3.node') {
+            localPrebuilt = full;
+            return;
+          }
+        }
+      } catch {}
+    };
+    findPrebuilt(path.join(ROOT_DIR, 'node_modules'));
+  }
+
+  if (localPrebuilt && existsSync(localPrebuilt)) {
     // Find better-sqlite3 in test-install node_modules
     const findAndCopy = (dir) => {
       if (!existsSync(dir)) return;
@@ -158,6 +177,11 @@ try {
 
   // Test sre-studio CLI
   const cliBin = path.join(installDir, 'node_modules', '.bin', process.platform === 'win32' ? 'sre-studio.cmd' : 'sre-studio');
+  if (process.platform !== 'win32') {
+    try {
+      chmodSync(cliBin, 0o755);
+    } catch {}
+  }
   const cliVer = spawnSync(cliBin, ['--version'], { encoding: 'utf8', shell: true });
   console.log(`  sre-studio --version: ${cliVer.stdout.trim()}`);
   if (cliVer.status !== 0 || !cliVer.stdout.includes('0.1.0')) {
@@ -179,6 +203,11 @@ try {
 
   // Test sre-studio-mcp startup
   const mcpBin = path.join(installDir, 'node_modules', '.bin', process.platform === 'win32' ? 'sre-studio-mcp.cmd' : 'sre-studio-mcp');
+  if (process.platform !== 'win32') {
+    try {
+      chmodSync(mcpBin, 0o755);
+    } catch {}
+  }
   const mcpSmoke = spawnSync('node', [
     '-e',
     `
